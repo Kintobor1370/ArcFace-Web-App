@@ -8,64 +8,40 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 
 namespace Database
 {
-    //______________________________________________________PERSISTENT STORAGE ATTRIBUTES_____________________________________________________
+    //_______________________________________________________ITEM OF PERSISTENT STORAGE_______________________________________________________
     public class Image
     {
         [Key]
-        public int ID
-        {
-            get;
-            set;
-        }
-        public string Name
-        {
-            get;
-            set;
-        }
-        public byte[] Data
-        {
-            get;
-            set;
-        }
-        public string Hash 
-        {
-            get;
-            set;
-        }
-        public byte[] Embedding
-        { 
-            get;
-            set;
-        }
+        public int ID { get; set; }
+        public string Name { get; set; }
+        public byte[] Data { get; set; }
+        public string Hash { get; set; }
+        public byte[] Embedding { get; set; }
 
-        // Creating hash-code based on the image's absolute path
+        // Get hash-code from an absolute path to the image file
         public static string GetHash(string image_path)
         {
             byte[] image_data = File.ReadAllBytes(image_path);
+
             using (var sha256 = SHA256.Create())
-            {
-                return string.Concat(
-                    sha256.ComputeHash(image_data).Select(x => x.ToString("X2"))
-                    );
+            { 
+                return string.Concat(sha256.ComputeHash(image_data).Select(x => x.ToString("X2"))); 
             }
         }
 
-        // Creating hash-code from the image's byte array
+        // Get hash-code from byte[] of the image data
         public static string GetHash(byte[] image_data)
         {
             using (var sha256 = SHA256.Create())
-            {
-                return string.Concat(
-                    sha256.ComputeHash(image_data).Select(x => x.ToString("X2"))
-                    );
+            { 
+                return string.Concat(sha256.ComputeHash(image_data).Select(x => x.ToString("X2"))); 
             }
         }
     }
 
-    public class Converters
+    // Converter from float[] to byte[] and vice versa (for writing and using Embedding vectors stored in the persistent storage)
+    public class Converter
     {
-        // float[] -> byte[] and byte[] -> float[] converters
-        // used to encode and decode Embeddings vector so that it could be kept in storage
         public static byte[] FloatToByte(float[] FloatArray)
         {
             byte[] ByteArray = new byte[FloatArray.Length * 4];
@@ -82,29 +58,17 @@ namespace Database
 
     public class Context : DbContext
     {
-        public DbSet<Image> Images
-        {
-            get;
-            set;
-        }
+        public DbSet<Image> Images { get; set; }
         public Context()
-        {
-            Database.EnsureCreated();
+        { 
+            Database.EnsureCreated(); 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder o) => o.UseSqlite("Data Source=ImageEmbeddings.db");
     }
 
     public class PostData
     {
-        public string Name
-        {
-            get;
-            set;
-        }
-        public string Base64String
-        {
-            get;
-            set;
-        }
+        public string Name { get; set; }
+        public string Base64String { get; set; }
     }
 }

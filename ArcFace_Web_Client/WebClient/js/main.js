@@ -3,8 +3,7 @@ let images_to_add = [];
 let selected_images = [];
 
 $(async () => {
-    try 
-    {
+    try {
         RefreshList();
         console.log('START!');
 
@@ -32,8 +31,8 @@ $(async () => {
         const Calculate = document.getElementById('Calculate');
         Calculate.addEventListener('click', CalculateTwoImages);
     }
-    catch(error) {
-        error => console.log(error);
+    catch(error) { 
+        error => console.log(error); 
     }
 })
 
@@ -92,10 +91,7 @@ async function RefreshList() {
     document.getElementById('Distance').innerHTML = '';
     document.getElementById('Similarity').innerHTML = '';
 
-    let response = await fetch(ServerLink, {
-        mode: 'cors',
-        method: 'GET' 
-    });
+    let response = await fetch(ServerLink, { mode: 'cors', method: 'GET' });
     let id_array = await response.json();
     id_array.forEach(id => SearchByID(id));
 
@@ -106,10 +102,7 @@ async function SearchByID(id) {
     console.log('ADDING NEW IMAGE...');
 
     let GetLink = ServerLink + "/id?id=" + id;
-    let response = await fetch(GetLink, {
-        mode: 'cors',
-        method: 'GET'
-    });
+    let response = await fetch(GetLink, { mode: 'cors', method: 'GET' });
     if (response.ok) {
         let image = await response.json();
 
@@ -175,17 +168,14 @@ async function CalculateTwoImages(event) {
     event.preventDefault();
     const combobox1 = document.getElementById('Image1');
     const combobox2 = document.getElementById('Image2');
-    if (combobox1.selectedIndex == -1 || combobox2.selectedIndex == -1)
+    if (combobox1.selectedIndex == -1 || combobox2.selectedIndex == -1) {
         return;
-
+    }
     console.log('STARTING CALCULATIONS...');
     let embeddings = [];
     for (let i=0; i<2; i++) {
         let GetLink = ServerLink + "/id?id=" + selected_images[i];
-        let response = await fetch(GetLink, {
-            mode: 'cors',
-            method: 'GET'
-        });
+        let response = await fetch(GetLink, { mode: 'cors', method: 'GET' });
         if (response.ok) { 
             let image = await response.json();
 
