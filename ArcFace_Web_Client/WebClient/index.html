@@ -13,7 +13,7 @@
             font-family: Arial, Helvetica, sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             min-height: 100vh;
-            color: #f8fafc;
+            color: white;
             padding: 40px 20px;
         }
         main {
@@ -33,8 +33,9 @@
         }
         .NewImageEntry form,
         .Comboboxes,
-        .DisVal,
-        .SimVal,
+        .Combobox1,
+        .Combobox2,
+        .Results,
         .DatabaseList {
             text-align: center;
         }
@@ -43,7 +44,7 @@
             margin-bottom: 12px;
             font-size: 1rem;
             font-weight: 600;
-            color: #e2e8f0;
+            color: white;
         }
         input[type="file"],
         select {
@@ -53,7 +54,7 @@
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.15);
             background: rgba(15, 23, 42, 0.8);
-            color: #f8fafc;
+            color: white;
             margin: 8px;
             outline: none;
             transition: 0.2s ease;
@@ -101,10 +102,13 @@
             background: rgba(15, 23, 42, 0.75);
             min-width: 250px;
         }
+        #WarningMessage {
+            color: red
+        }
         .Name h1 {
             margin: 18px 0;
             font-size: 1.8rem;
-            color: #ffffff;
+            color: white;
         }
         hr {
             border: none;
@@ -157,6 +161,12 @@
 </head>
 <body>
     <main>
+        <section class="Intro" style="text-align: center;">
+            <div class="Name">
+                <h1>ArcFace Web Client</h1>
+                <p>Upload ANY two face images and check how similar they are!</p>
+            </div>
+        </section>
         <section class="NewImageEntry">
             <form id="ImagePathForm" style="text-align: center;">
                 <label for="NewImage">Add new image to the database:</label>
@@ -164,17 +174,24 @@
                 <button id="AddImage" class="button" title="Add new image to the database" tabindex="0">Add</button>
             </form>
         </section>
-        <section class="Comboboxes" style="text-align: center;">
-            <select required id="Image1"></select>
-            <select required id="Image2"></select>
+        <section class="Comboboxes">
+            <section class="Combobox1">
+                <label for="Image1">Choose the first image: </label>
+                <select required id="Image1"></select>
+            </section>
+            <section class="Combobox2">
+                <label for="Image2">Choose the second image:</label>
+                <select required id="Image2"></select>
+            </section>
             <button id="Calculate" class="button" title="Calculate distance & similarity" tabindex="0">
                 Start Calculations
             </button>
+            <p id="WarningMessage"></p>
         </section>
-        <section class="DisVal" style="text-align: center;">
+        <section class="Results">
+            <h1>Results:</h1>
+            <hr/>
             <label id="Distance"></label>
-        </section>
-        <section class="SimVal" style="text-align: center;">
             <label id="Similarity"></label>
         </section>
         <section class="DatabaseList" style="text-align: center;">
@@ -190,8 +207,7 @@
                 <h1>Images from the database</h1>
                 <hr/>
             </div>
-            <div id="ImagesFromDatabase">
-            </div>
+            <div id="ImagesFromDatabase"></div>
         </section>
     </main>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"

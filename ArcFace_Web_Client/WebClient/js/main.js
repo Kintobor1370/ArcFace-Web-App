@@ -1,6 +1,8 @@
 const ServerLink = 'http://localhost:5240/images';
 let images_to_add = [];
 let selected_images = [];
+let dist_str = 'Distance: ';
+let sim_str = 'Similarity: ';
 
 $(async () => {
     try {
@@ -19,14 +21,16 @@ $(async () => {
         const Combobox1 = document.getElementById('Image1');
         Combobox1.addEventListener('change', function() {
             selected_images[0] = Combobox1.value;
-            document.getElementById('Distance').innerHTML = '';
+            document.getElementById('Distance').innerHTML = dist_str;
         });
 
         const Combobox2 = document.getElementById('Image2');
         Combobox2.addEventListener('change', function() {
             selected_images[1] = Combobox2.value;
-            document.getElementById('Similarity').innerHTML = '';
+            document.getElementById('Similarity').innerHTML = sim_str;
         });
+        document.getElementById('Distance').innerHTML = dist_str;
+        document.getElementById('Similarity').innerHTML = sim_str;
 
         const Calculate = document.getElementById('Calculate');
         Calculate.addEventListener('click', CalculateTwoImages);
@@ -85,23 +89,27 @@ async function RefreshList() {
     images_to_add = [];
     selected_images = [];
 
-    document.getElementById('ImagesFromDatabase').innerHTML = '';
+    document.getElementById('ImagesFromDatabase').innerHTML = 'Connecting to the database...';
     document.getElementById('Image1').innerHTML = '';
     document.getElementById('Image2').innerHTML = '';
-    document.getElementById('Distance').innerHTML = '';
-    document.getElementById('Similarity').innerHTML = '';
+    document.getElementById('Distance').innerHTML = dist_str;
+    document.getElementById('Similarity').innerHTML = sim_str;
 
     let response = await fetch(ServerLink, { mode: 'cors', method: 'GET' });
     let id_array = await response.json();
     id_array.forEach(id => SearchByID(id));
 
+    document.getElementById('ImagesFromDatabase').innerHTML = '';
+    if (id_array.length == 0) {
+        document.getElementById('ImagesFromDatabase').innerHTML = 'The database is empty';
+    }
     console.log('LIST REFRESHED!');
 }
 
 async function SearchByID(id) {
     console.log('ADDING NEW IMAGE...');
 
-    let GetLink = ServerLink + "/id?id=" + id;
+    let GetLink = ServerLink + '/id?id=' + id;
     let response = await fetch(GetLink, { mode: 'cors', method: 'GET' });
     if (response.ok) {
         let image = await response.json();
@@ -150,9 +158,9 @@ async function DeleteImages(event) {
         let res = await response.json();
         selected_images = [];
 
-        document.getElementById('ImagesFromDatabase').innerHTML = '';
-        document.getElementById('Distance').innerHTML = '';
-        document.getElementById('Similarity').innerHTML = '';
+        document.getElementById('ImagesFromDatabase').innerHTML = 'The database is empty';
+        document.getElementById('Distance').innerHTML = dist_str;
+        document.getElementById('Similarity').innerHTML = sim_str;
         document.getElementById('Image1').innerHTML = '';
         document.getElementById('Image2').innerHTML = '';
         document.getElementById('Image1').selectedIndex = -1;
@@ -168,9 +176,25 @@ async function CalculateTwoImages(event) {
     event.preventDefault();
     const combobox1 = document.getElementById('Image1');
     const combobox2 = document.getElementById('Image2');
-    if (combobox1.selectedIndex == -1 || combobox2.selectedIndex == -1) {
+    if (combobox1.selectedIndex == -1 && combobox2.selectedIndex == -1) {
+        document.getElementById('WarningMessage').innerHTML = 'Please select one image from every list';
         return;
     }
+    else if (combobox1.selectedIndex == -1) {
+        document.getElementById('WarningMessage').innerHTML = 'Please select the first image';
+        return;
+    }
+    else if (combobox2.selectedIndex == -1) {
+        document.getElementById('WarningMessage').innerHTML = 'Please select the second image';
+        return;
+    }
+    else if (document.getElementById('ImagesFromDatabase').innerHTML == 'Connecting to the database...') {
+        document.getElementById('WarningMessage').innerHTML = 'Loading images from the storage, please wait';
+        return;
+    }
+
+    document.getElementById('Distance').innerHTML = dist_str + 'calculating...';
+    document.getElementById('Similarity').innerHTML = sim_str + 'calculating...';
     console.log('STARTING CALCULATIONS...');
     let embeddings = [];
     for (let i=0; i<2; i++) {
@@ -209,7 +233,7 @@ async function CalculateTwoImages(event) {
     }
     Distance = Math.sqrt(Distance);
 
-    document.getElementById('Distance').innerHTML = 'Distance: ' + Distance.toFixed(7);
-    document.getElementById('Similarity').innerHTML = 'Similarity: ' + Similarity.toFixed(7);
+    document.getElementById('Distance').innerHTML = dist_str + Distance.toFixed(7);
+    document.getElementById('Similarity').innerHTML = sim_str + Similarity.toFixed(7);
     console.log('CALCULATIONS FINISHED!');
 }
